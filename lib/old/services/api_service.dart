@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:to_do_app/models/todo.dart';
+
+import '../models/todo.dart';
 
 class ApiService {
   final Dio _dio = Dio();

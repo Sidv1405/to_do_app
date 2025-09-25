@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:to_do_app/models/todo.dart';
+
+import '../models/todo.dart';
 
 class TodoCard extends StatelessWidget {
   final Todo todo;
@@ -14,9 +15,13 @@ class TodoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Card(
       elevation: 3,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      color: colorScheme.surfaceContainerLow,
       child: InkWell(
         onTap: onEdit,
         borderRadius: BorderRadius.circular(8),
@@ -30,24 +35,26 @@ class TodoCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       todo.title,
-                      style: TextStyle(
-                        fontSize: 16,
+                      style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         decoration: todo.isDone
                             ? TextDecoration.lineThrough
                             : null,
-                        color: todo.isDone ? Colors.grey : null,
+                        color: todo.isDone
+                            ? colorScheme.outline
+                            : colorScheme.onSurface,
                       ),
                     ),
                   ),
-
                   IconButton(
                     onPressed: onToggle,
                     icon: Icon(
                       todo.isDone
                           ? Icons.check_box
                           : Icons.check_box_outline_blank,
-                      color: todo.isDone ? Colors.green : null,
+                      color: todo.isDone
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
                     ),
                   ),
                   PopupMenuButton<String>(
@@ -55,23 +62,33 @@ class TodoCard extends StatelessWidget {
                       if (value == 'edit' && onEdit != null) onEdit!();
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'edit',
                         child: Row(
                           children: [
-                            Icon(Icons.edit),
-                            SizedBox(width: 8),
-                            Text('Update'),
+                            Icon(Icons.edit, color: colorScheme.primary),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Update',
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete, color: Colors.red),
-                            SizedBox(width: 8),
-                            Text('Delete', style: TextStyle(color: Colors.red)),
+                            Icon(Icons.delete, color: colorScheme.error),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Delete',
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.error,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -84,7 +101,9 @@ class TodoCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   todo.description,
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -96,15 +115,17 @@ class TodoCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.check_circle,
                       size: 16,
-                      color: Colors.green,
+                      color: colorScheme.primary,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       'Done: ${_formatDate(todo.completedAt!)}',
-                      style: const TextStyle(fontSize: 12, color: Colors.green),
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.primary,
+                      ),
                     ),
                   ],
                 ),

@@ -79,6 +79,7 @@ class _TodoFormDialogState extends State<TodoFormDialog> {
           ),
           backgroundColor: Theme.of(context).colorScheme.primary,
           duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }
@@ -89,7 +90,8 @@ class _TodoFormDialogState extends State<TodoFormDialog> {
     return AlertDialog(
       title: const Text('Add new todo'),
       content: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.8,
+        width: MediaQuery.of(context).size.width * 0.7,
+        height: MediaQuery.of(context).size.height * 0.5,
         child: Form(
           key: _formKey,
           autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -138,6 +140,7 @@ class _TodoFormDialogState extends State<TodoFormDialog> {
                 content: const Text('Cancel'),
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 duration: const Duration(seconds: 1),
+                behavior: SnackBarBehavior.floating,
               ),
             );
           },

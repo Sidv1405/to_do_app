@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:to_do_app/screens/todo_list_screen.dart';
-import 'package:to_do_app/theme/theme.dart';
-import 'package:to_do_app/util.dart';
+import 'package:to_do_app/old/screens/todo_list_screen.dart';
+import 'package:to_do_app/old/theme/theme.dart';
+import 'package:to_do_app/old/util.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

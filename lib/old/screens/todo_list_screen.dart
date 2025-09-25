@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:to_do_app/models/todo.dart';
-import 'package:to_do_app/services/api_service.dart';
-import 'package:to_do_app/widgets/todo_form_dialog.dart';
-import 'package:to_do_app/widgets/todo_card.dart';
+
+import '../models/todo.dart';
+import '../services/api_service.dart';
+import '../widgets/todo_card.dart';
+import '../widgets/todo_form_dialog.dart';
 
 class TodoListScreen extends StatefulWidget {
   const TodoListScreen({super.key});
@@ -45,10 +46,11 @@ class _ToDoListScreenState extends State<TodoListScreen> {
         backgroundColor: Theme.of(context).colorScheme.error,
         duration: const Duration(seconds: 3),
         action: SnackBarAction(
-          label: 'Thử lại',
+          label: 'Try again',
           textColor: Theme.of(context).colorScheme.onError,
           onPressed: fetchToDos,
         ),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
@@ -59,6 +61,7 @@ class _ToDoListScreenState extends State<TodoListScreen> {
         content: Text(message),
         backgroundColor: Theme.of(context).colorScheme.primary,
         duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
