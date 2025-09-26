@@ -1,5 +1,4 @@
-import 'package:provider/provider.dart';
-import 'package:provider/single_child_widget.dart';
+import 'package:get_it/get_it.dart';
 import 'package:to_do_app/new/core/constants/api_constants.dart';
 import 'package:to_do_app/new/core/network/dio_client.dart';
 import 'package:to_do_app/new/core/network/dio_helper.dart';
@@ -15,60 +14,55 @@ import 'package:to_do_app/new/features/todos/domain/usecases/toggle_todo_usecase
 import 'package:to_do_app/new/features/todos/domain/usecases/update_todo_usecase.dart';
 import 'package:to_do_app/new/features/todos/presentation/viewmodels/todo_page_viewmodel.dart';
 
-List<SingleChildWidget> providers = [
-  ///DioClientProvider
-  Provider<DioClient>(
-    create: (_) => DioClient(DioHelper.buildDio(baseUrl: Constants.baseURL)),
-  ),
+final getIt = GetIt.instance;
 
-  ///ApiServiceProvider
-  ProxyProvider<DioClient, ApiService>(
-    update: (_, dioClient, _) => ApiService(dioClient: dioClient),
-  ),
+Future<void> initDependencies() async {
+  //DioClient
+  getIt.registerLazySingleton<DioClient>(
+    () => DioClient(DioHelper.buildDio(baseUrl: Constants.baseURL)),
+  );
 
-  ///RepositoryProvider
-  ProxyProvider<ApiService, TodoRepository>(
-    update: (_, apiService, _) => TodoRepositoryImpl(apiService: apiService),
-  ),
+  //ApiService
+  getIt.registerLazySingleton<ApiService>(
+    () => ApiService(dioClient: getIt<DioClient>()),
+  );
 
-  ///UseCaseProvider
-  Provider<AddTodoUseCase>(
-    create: (context) =>
-        AddTodoUseCase(repository: context.read<TodoRepository>()),
-  ),
-  Provider<ClearCompletedTodosUseCase>(
-    create: (context) =>
-        ClearCompletedTodosUseCase(repository: context.read<TodoRepository>()),
-  ),
-  Provider<FilterTodosUseCase>(
-    create: (context) =>
-        FilterTodosUseCase(repository: context.read<TodoRepository>()),
-  ),
-  Provider<SearchTodosUseCase>(
-    create: (context) =>
-        SearchTodosUseCase(repository: context.read<TodoRepository>()),
-  ),
-  Provider<SortTodosUseCase>(
-    create: (context) =>
-        SortTodosUseCase(repository: context.read<TodoRepository>()),
-  ),
-  Provider<ToggleTodoUseCase>(
-    create: (context) =>
-        ToggleTodoUseCase(repository: context.read<TodoRepository>()),
-  ),
-  Provider<UpdateTodoUseCase>(
-    create: (context) =>
-        UpdateTodoUseCase(repository: context.read<TodoRepository>()),
-  ),
+  //Repository
+  getIt.registerLazySingleton<TodoRepository>(
+    () => TodoRepositoryImpl(apiService: getIt<ApiService>()),
+  );
 
-  ///ViewModelProvider
-  ChangeNotifierProvider(
-    create: (context) => TodoPageViewmodel(
-      clearCompletedTodosUseCase: context.read<ClearCompletedTodosUseCase>(),
-      filterTodosUseCase: context.read<FilterTodosUseCase>(),
-      searchTodosUseCase: context.read<SearchTodosUseCase>(),
-      sortTodosUseCase: context.read<SortTodosUseCase>(),
-      todoRepository: context.read<TodoRepository>(),
+  //UseCases
+  getIt.registerLazySingleton<AddTodoUseCase>(
+    () => AddTodoUseCase(repository: getIt<TodoRepository>()),
+  );
+  getIt.registerLazySingleton<ClearCompletedTodosUseCase>(
+    () => ClearCompletedTodosUseCase(repository: getIt<TodoRepository>()),
+  );
+  getIt.registerLazySingleton<FilterTodosUseCase>(
+    () => FilterTodosUseCase(repository: getIt<TodoRepository>()),
+  );
+  getIt.registerLazySingleton<SearchTodosUseCase>(
+    () => SearchTodosUseCase(repository: getIt<TodoRepository>()),
+  );
+  getIt.registerLazySingleton<SortTodosUseCase>(
+    () => SortTodosUseCase(repository: getIt<TodoRepository>()),
+  );
+  getIt.registerLazySingleton<ToggleTodoUseCase>(
+    () => ToggleTodoUseCase(repository: getIt<TodoRepository>()),
+  );
+  getIt.registerLazySingleton<UpdateTodoUseCase>(
+    () => UpdateTodoUseCase(repository: getIt<TodoRepository>()),
+  );
+
+  //ViewModel
+  getIt.registerLazySingleton<TodoPageViewmodel>(
+    () => TodoPageViewmodel(
+      clearCompletedTodosUseCase: getIt<ClearCompletedTodosUseCase>(),
+      filterTodosUseCase: getIt<FilterTodosUseCase>(),
+      searchTodosUseCase: getIt<SearchTodosUseCase>(),
+      sortTodosUseCase: getIt<SortTodosUseCase>(),
+      todoRepository: getIt<TodoRepository>(),
     ),
-  ),
-];
+  );
+}

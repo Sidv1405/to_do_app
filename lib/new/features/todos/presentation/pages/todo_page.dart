@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do_app/new/features/todos/presentation/viewmodels/todo_page_viewmodel.dart';
-import 'package:to_do_app/new/features/todos/presentation/widgets/todo_item.dart';
+
+import '../../../../core/di/dependency_container.dart';
+import '../widgets/todo_item.dart';
 
 class TodoPage extends StatelessWidget {
   const TodoPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<TodoPageViewmodel>(
+      create: (_) => getIt<TodoPageViewmodel>(),
+      child: const TodoPageBody(),
+    );
+  }
+}
+
+class TodoPageBody extends StatelessWidget {
+  const TodoPageBody({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +46,7 @@ class TodoPage extends StatelessWidget {
           if (todos.isEmpty) {
             return Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.task_alt,
@@ -58,6 +73,7 @@ class TodoPage extends StatelessWidget {
           }
 
           return RefreshIndicator(
+            onRefresh: () async {},
             child: ListView.builder(
               itemCount: todos.length,
               itemBuilder: (context, index) {
@@ -70,7 +86,6 @@ class TodoPage extends StatelessWidget {
                 );
               },
             ),
-            onRefresh: () async {},
           );
         },
       ),
