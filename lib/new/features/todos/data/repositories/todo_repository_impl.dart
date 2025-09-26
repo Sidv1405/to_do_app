@@ -1,8 +1,13 @@
+import 'package:to_do_app/new/core/service/api_service.dart';
 import 'package:to_do_app/new/features/todos/domain/entities/todo.dart';
 
 import '../../domain/repositories/todo_repository.dart';
 
 class TodoRepositoryImpl implements TodoRepository {
+  final ApiService apiService;
+
+  TodoRepositoryImpl({required this.apiService});
+
   @override
   Future<Todo> addTodo(String title, String description) {
     // TODO: implement addTodo

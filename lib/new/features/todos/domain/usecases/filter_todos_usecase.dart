@@ -1,3 +1,7 @@
+import '../repositories/todo_repository.dart';
+
 class FilterTodosUseCase {
-  /// Có thể thêm logic: validate status, default all → nên giữ UseCase
+  final TodoRepository repository;
+
+  FilterTodosUseCase({required this.repository});
 }

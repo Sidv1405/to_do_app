@@ -1,3 +1,7 @@
+import '../repositories/todo_repository.dart';
+
 class SortTodosUseCase {
-  /// Nên giữ UseCase để validate sort field, order, hoặc custom sort logic
+  final TodoRepository repository;
+
+  SortTodosUseCase({required this.repository});
 }

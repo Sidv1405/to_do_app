@@ -1,3 +1,7 @@
+import '../repositories/todo_repository.dart';
+
 class AddTodoUseCase {
-  // them logic validate ( title, description, dateTime)
+  final TodoRepository repository;
+
+  AddTodoUseCase({required this.repository});
 }

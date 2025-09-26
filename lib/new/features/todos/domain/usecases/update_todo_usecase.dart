@@ -1,3 +1,7 @@
+import '../repositories/todo_repository.dart';
+
 class UpdateTodoUseCase {
-  // Them logic chi update khi todo chua done
+  final TodoRepository repository;
+
+  UpdateTodoUseCase({required this.repository});
 }

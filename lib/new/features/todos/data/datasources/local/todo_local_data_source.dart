@@ -1,1 +1,3 @@
-abstract class TodoLocalDataSource {}
+abstract class TodoLocalDataSource {
+  // Todo
+}

@@ -20,31 +20,32 @@ samples, guidance on mobile development, and a full API reference.
 lib/
 ├── core/                          
 │ ├── constants/                 
-│ ├── error/                     
-│ ├── utils/                     
-│ ├── network/                  
 │ ├── di/                       
+│ ├── error/                     
+│ ├── network/                  
+│ ├── service/                  
+│ ├── utils/                     
+│ ├── validate/                     
 │
 ├── features/                      
 │ ├── todos/
-│ ├── data/
-│ │ ├── datasources/       
-│ │ │ ├── remote/       
-│ │ │ └── local/         
-│ │ ├── models/           
-│ │ ├── mappers/          
-│ │ └── repositories/     
-│ │
-│ ├── domain/
-│ │ ├── entities/          
-│ │ ├── repositories/      
-│ │ └── usecases/        
-│ │
-│ └── presentation/
-│ ├── viewmodels/       
-│ ├── pages/             
-│ └── widgets/          
-│    
+│ │ ├── data/
+│ │ │ ├── datasources/       
+│ │ │ │ ├── remote/       
+│ │ │ │ └── local/         
+│ │ │ ├── models/           
+│ │ │ ├── mappers/          
+│ │ │ └── repositories/     
+│ │ │
+│ │ ├── domain/
+│ │ │ ├── entities/          
+│ │ │ ├── repositories/      
+│ │ │ └── usecases/        
+│ │ │
+│ │ ├── presentation/
+│ │ │ ├── viewmodels/       
+│ │ │ ├── pages/             
+│ │ │ └── widgets/      
 │
 ├── app.dart                       
 └── main.dart                      

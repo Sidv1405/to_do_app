@@ -1,3 +1,7 @@
+import '../repositories/todo_repository.dart';
+
 class ToggleTodoUseCase {
-  // Them logic check todo ton tai hay khong truoc khi toggle
+  final TodoRepository repository;
+
+  ToggleTodoUseCase({required this.repository});
 }

@@ -1,11 +1,6 @@
 import '../../domain/entities/todo.dart';
 import '../models/todo_model.dart';
 
-/// -----------------------------
-/// Extensions Mapper
-/// -----------------------------
-
-/// TodoModel -> Todo (Data -> Domain)
 extension TodoModelMapper on TodoModel {
   Todo toEntity() {
     return Todo(
@@ -20,7 +15,6 @@ extension TodoModelMapper on TodoModel {
   }
 }
 
-/// Todo -> TodoModel (Domain -> Data)
 extension TodoEntityMapper on Todo {
   TodoModel toModel() {
     return TodoModel(
@@ -35,12 +29,10 @@ extension TodoEntityMapper on Todo {
   }
 }
 
-/// List TodoModel -> List Todo
 extension TodoModelListMapper on List<TodoModel> {
   List<Todo> toEntityList() => map((e) => e.toEntity()).toList();
 }
 
-/// List Todo -> List TodoModel
 extension TodoEntityListMapper on List<Todo> {
   List<TodoModel> toModelList() => map((e) => e.toModel()).toList();
 }

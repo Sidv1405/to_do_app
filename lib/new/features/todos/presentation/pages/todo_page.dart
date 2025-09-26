@@ -1,0 +1,84 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do_app/new/features/todos/presentation/viewmodels/todo_page_viewmodel.dart';
+import 'package:to_do_app/new/features/todos/presentation/widgets/todo_item.dart';
+
+class TodoPage extends StatelessWidget {
+  const TodoPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final todoPageViewModel = context.watch<TodoPageViewmodel>();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Todos'),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh Todos',
+          ),
+        ],
+      ),
+      body: Builder(
+        builder: (context) {
+          if (todoPageViewModel.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final todos = todoPageViewModel.todos;
+
+          if (todos.isEmpty) {
+            return Center(
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.task_alt,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No todos yet',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Press the + button to add a new todo',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            child: ListView.builder(
+              itemCount: todos.length,
+              itemBuilder: (context, index) {
+                final todo = todos[index];
+                return TodoItem(
+                  key: ValueKey(todo.id),
+                  todo: todo,
+                  onToggle: () {},
+                  onEdit: () {},
+                );
+              },
+            ),
+            onRefresh: () async {},
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        tooltip: 'Add new todo',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}

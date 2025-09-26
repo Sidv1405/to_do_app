@@ -1,2 +1,7 @@
-/// Có thể thêm logic: normalize query, trim, lowercase → nên giữ UseCase
-class SearchTodosUseCase {}
+import '../repositories/todo_repository.dart';
+
+class SearchTodosUseCase {
+  final TodoRepository repository;
+
+  SearchTodosUseCase({required this.repository});
+}
