@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do_app/new/features/todos/presentation/viewmodels/todo_page_viewmodel.dart';
+import 'package:to_do_app/new/features/todos/presentation/widgets/todo_form_dialog.dart';
 
 import '../../../../core/di/dependency_container.dart';
 import '../widgets/todo_item.dart';
@@ -29,7 +30,7 @@ class TodoPageBody extends StatelessWidget {
         title: const Text('Todos'),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: todoPageViewModel.getTodos,
             icon: const Icon(Icons.refresh),
             tooltip: 'Refresh Todos',
           ),
@@ -73,7 +74,7 @@ class TodoPageBody extends StatelessWidget {
           }
 
           return RefreshIndicator(
-            onRefresh: () async {},
+            onRefresh: () => todoPageViewModel.getTodos(),
             child: ListView.builder(
               itemCount: todos.length,
               itemBuilder: (context, index) {
@@ -90,7 +91,12 @@ class TodoPageBody extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => const TodoFormDialog(),
+          );
+        },
         tooltip: 'Add new todo',
         child: const Icon(Icons.add),
       ),

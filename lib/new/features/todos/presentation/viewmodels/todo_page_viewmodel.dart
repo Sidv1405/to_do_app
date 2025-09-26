@@ -45,4 +45,15 @@ class TodoPageViewmodel extends ChangeNotifier {
     _todos = value;
     notifyListeners();
   }
+
+  Future<void> getTodos() async {
+    isLoading = true;
+    try {
+      todos = await todoRepository.getTodos();
+    } catch (e) {
+      errorMessage = e.toString();
+    } finally {
+      isLoading = false;
+    }
+  }
 }

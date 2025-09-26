@@ -1,4 +1,5 @@
 import 'package:to_do_app/new/core/service/api_service.dart';
+import 'package:to_do_app/new/features/todos/data/mappers/todo_mapper.dart';
 import 'package:to_do_app/new/features/todos/domain/entities/todo.dart';
 
 import '../../domain/repositories/todo_repository.dart';
@@ -9,9 +10,9 @@ class TodoRepositoryImpl implements TodoRepository {
   TodoRepositoryImpl({required this.apiService});
 
   @override
-  Future<Todo> addTodo(String title, String description) {
-    // TODO: implement addTodo
-    throw UnimplementedError();
+  Future<Todo> addTodo(String title, String description) async {
+    final newTodo = await apiService.addTodo(title, description);
+    return newTodo.toEntity();
   }
 
   @override
@@ -39,9 +40,11 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   @override
-  Future<List<Todo>> getTodos() {
-    // TODO: implement getTodos
-    throw UnimplementedError();
+  Future<List<Todo>> getTodos() async {
+    final todosModel = await apiService.getTodos();
+    // map sang domain entity
+    final todosDomain = todosModel.toEntityList().toList();
+    return todosDomain;
   }
 
   @override
