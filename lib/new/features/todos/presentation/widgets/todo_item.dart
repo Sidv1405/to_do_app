@@ -5,9 +5,16 @@ import '../../domain/entities/todo.dart';
 class TodoItem extends StatelessWidget {
   final Todo todo;
   final VoidCallback? onToggle;
-  final VoidCallback? onEdit;
+  final VoidCallback? onUpdate;
+  final VoidCallback? onDelete;
 
-  const TodoItem({super.key, required this.todo, this.onToggle, this.onEdit});
+  const TodoItem({
+    super.key,
+    required this.todo,
+    this.onToggle,
+    this.onUpdate,
+    this.onDelete,
+  });
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
@@ -23,7 +30,7 @@ class TodoItem extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       color: colorScheme.surfaceContainerLow,
       child: InkWell(
-        onTap: onEdit,
+        onTap: () {},
         borderRadius: BorderRadius.circular(8),
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -59,11 +66,12 @@ class TodoItem extends StatelessWidget {
                   ),
                   PopupMenuButton<String>(
                     onSelected: (value) {
-                      if (value == 'edit' && onEdit != null) onEdit!();
+                      if (value == 'update' && onUpdate != null) onUpdate!();
+                      if (value == 'delete' && onDelete != null) onDelete!();
                     },
                     itemBuilder: (context) => [
                       PopupMenuItem(
-                        value: 'edit',
+                        value: 'update',
                         child: Row(
                           children: [
                             Icon(Icons.edit, color: colorScheme.primary),

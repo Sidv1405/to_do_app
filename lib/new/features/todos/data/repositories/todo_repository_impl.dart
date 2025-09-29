@@ -10,8 +10,18 @@ class TodoRepositoryImpl implements TodoRepository {
   TodoRepositoryImpl({required this.apiService});
 
   @override
-  Future<Todo> addTodo(String title, String description) async {
-    final newTodo = await apiService.addTodo(title, description);
+  Future<Todo> addTodo(
+    String title,
+    String description,
+    DateTime createdAt,
+    DateTime dueDate,
+  ) async {
+    final newTodo = await apiService.addTodo(
+      title,
+      description,
+      createdAt,
+      dueDate,
+    );
     return newTodo.toEntity();
   }
 
@@ -22,9 +32,9 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   @override
-  Future<void> deleteTodo(String id) {
-    // TODO: implement deleteTodo
-    throw UnimplementedError();
+  Future<void> deleteTodo(String id) async {
+    final response = await apiService.deleteTodo(id);
+    return response;
   }
 
   @override
@@ -35,8 +45,9 @@ class TodoRepositoryImpl implements TodoRepository {
 
   @override
   Future<Todo> getTodoById(String id) {
-    // TODO: implement getTodoById
-    throw UnimplementedError();
+    return getTodos().then(
+      (todos) => todos.firstWhere((todo) => todo.id == id),
+    );
   }
 
   @override
@@ -60,14 +71,27 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   @override
-  Future<Todo> toggleTodo(String id) {
-    // TODO: implement toggleTodo
-    throw UnimplementedError();
+  Future<Todo> changeTodoStatus(String id) async {
+    final todo = await getTodoById(id);
+    final updatedTodo = await apiService.changeTodoStatus(id, !todo.isDone);
+    return updatedTodo.toEntity();
   }
 
   @override
-  Future<Todo> updateTodo(String id, String title, String description) {
-    // TODO: implement updateTodo
-    throw UnimplementedError();
+  Future<Todo> updateTodo(
+    String id,
+    String title,
+    String description,
+    DateTime createdAt,
+    DateTime dueDate,
+  ) async {
+    final newTodo = await apiService.updateTodo(
+      id,
+      title,
+      description,
+      createdAt,
+      dueDate,
+    );
+    return newTodo.toEntity();
   }
 }

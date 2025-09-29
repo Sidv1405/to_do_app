@@ -5,16 +5,27 @@ abstract class TodoRepository {
   Future<List<Todo>> getTodos();
 
   /// add a new todo
-  Future<Todo> addTodo(String title, String description);
+  Future<Todo> addTodo(
+    String title,
+    String description,
+    DateTime createdAt,
+    DateTime dueDate,
+  );
 
   /// Change toggle status of todo ( done / not done )
-  Future<Todo> toggleTodo(String id);
+  Future<Todo> changeTodoStatus(String id);
 
   /// delete a todo
   Future<void> deleteTodo(String id);
 
   /// update title and description a todo
-  Future<Todo> updateTodo(String id, String title, String description);
+  Future<Todo> updateTodo(
+    String id,
+    String title,
+    String description,
+    DateTime createdAt,
+    DateTime dueDate,
+  );
 
   /// get a todo by id
   Future<Todo> getTodoById(String id);

@@ -11,10 +11,52 @@ class ApiService {
     return (response as List).map((e) => TodoModel.fromJson(e)).toList();
   }
 
-  Future<TodoModel> addTodo(String title, String description) async {
+  Future<TodoModel> addTodo(
+    String title,
+    String description,
+    DateTime createAt,
+    DateTime dueDate,
+  ) async {
     final response = await dioClient.post(
       '/todos',
-      data: {'title': title, 'description': description},
+      data: {
+        'title': title,
+        'description': description,
+        'created_at': createAt.toIso8601String(),
+        'due_date': dueDate.toIso8601String(),
+      },
+    );
+    return TodoModel.fromJson(response);
+  }
+
+  Future<TodoModel> updateTodo(
+    String id,
+    String title,
+    String description,
+    DateTime createAt,
+    DateTime dueDate,
+  ) async {
+    final response = await dioClient.put(
+      '/todos/$id',
+      data: {
+        'title': title,
+        'description': description,
+        'created_at': createAt.toIso8601String(),
+        'due_date': dueDate.toIso8601String(),
+      },
+    );
+    return TodoModel.fromJson(response);
+  }
+
+  Future<void> deleteTodo(String id) async {
+    final response = await dioClient.delete('/todos/$id');
+    return response;
+  }
+
+  Future<TodoModel> changeTodoStatus(String id, bool isDone) async {
+    final response = await dioClient.patch(
+      '/todos/$id',
+      data: {'is_done': isDone},
     );
     return TodoModel.fromJson(response);
   }

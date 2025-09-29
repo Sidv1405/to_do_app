@@ -63,6 +63,7 @@ Future<void> initDependencies() async {
       searchTodosUseCase: getIt<SearchTodosUseCase>(),
       sortTodosUseCase: getIt<SortTodosUseCase>(),
       todoRepository: getIt<TodoRepository>(),
+      addTodoUseCase: getIt<AddTodoUseCase>(),
     ),
   );
 }

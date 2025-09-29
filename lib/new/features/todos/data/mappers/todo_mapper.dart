@@ -18,7 +18,7 @@ extension TodoModelMapper on TodoModel {
 extension TodoEntityMapper on Todo {
   TodoModel toModel() {
     return TodoModel(
-      id: id,
+      id: id ?? '',
       title: title,
       description: description,
       isDone: isDone,
