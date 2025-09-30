@@ -35,21 +35,22 @@ class TodoModel {
       'title': title,
       'description': description,
       'is_done': isDone,
-      'created_at': createdAt.toIso8601String(),
-      'completed_at': completedAt?.toIso8601String(),
-      'due_date': dueDate.toIso8601String(),
+      // ép về epoch milli (int)
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'completed_at': completedAt?.millisecondsSinceEpoch,
+      'due_date': dueDate.millisecondsSinceEpoch,
     };
   }
 
-  // hỗ trợ parse nhiều kiểu dữ liệu mà MockAPI trả về
+  // Hỗ trợ parse nhiều kiểu dữ liệu mà MockAPI trả về
   static DateTime? _parseDate(dynamic value) {
     if (value == null) return null;
     if (value is int) {
-      // nếu là epoch giây
+      // epoch giây
       if (value < 10000000000) {
         return DateTime.fromMillisecondsSinceEpoch(value * 1000);
       }
-      // nếu là epoch milli
+      // epoch milli
       return DateTime.fromMillisecondsSinceEpoch(value);
     }
     if (value is String) {

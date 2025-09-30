@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../domain/entities/todo.dart';
 
@@ -30,7 +31,9 @@ class TodoItem extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       color: colorScheme.surfaceContainerLow,
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          context.push('/detail', extra: todo);
+        },
         borderRadius: BorderRadius.circular(8),
         child: Padding(
           padding: const EdgeInsets.all(12),

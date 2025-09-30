@@ -37,8 +37,8 @@ class TodoPageBody extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: todoPageViewModel.getTodos,
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh Todos',
+            icon: const Icon(Icons.search),
+            tooltip: 'Search Todos',
           ),
           PopupMenuButton<String>(
             // initialValue: todoPageViewModel.filter,

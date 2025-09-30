@@ -17,15 +17,17 @@ class ApiService {
     DateTime createAt,
     DateTime dueDate,
   ) async {
-    final response = await dioClient.post(
-      '/todos',
-      data: {
-        'title': title,
-        'description': description,
-        'created_at': createAt.toIso8601String(),
-        'due_date': dueDate.toIso8601String(),
-      },
+    final todo = TodoModel(
+      id: '',
+      // server sẽ tự sinh id
+      title: title,
+      description: description,
+      isDone: false,
+      createdAt: createAt,
+      dueDate: dueDate,
     );
+
+    final response = await dioClient.post('/todos', data: todo.toJson());
     return TodoModel.fromJson(response);
   }
 
@@ -56,7 +58,10 @@ class ApiService {
   Future<TodoModel> changeTodoStatus(String id, bool isDone) async {
     final response = await dioClient.patch(
       '/todos/$id',
-      data: {'is_done': isDone},
+      data: {
+        'is_done': isDone,
+        'completed_at': isDone ? DateTime.now().millisecondsSinceEpoch : null,
+      },
     );
     return TodoModel.fromJson(response);
   }
