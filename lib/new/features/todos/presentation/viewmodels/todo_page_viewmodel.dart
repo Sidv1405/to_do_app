@@ -181,23 +181,23 @@ class TodoPageViewmodel extends ChangeNotifier {
     final q = query.trim().toLowerCase();
 
     if (q.isEmpty) {
-      // Khi xóa hết chữ, vẫn ở chế độ search, nhưng show list gốc
       _filteredTodos = _todos;
     } else {
-      _filteredTodos = _todos.where((t) {
-        return t.title.toLowerCase().contains(q) ||
-            t.description.toLowerCase().contains(q);
-      }).toList();
+      todoRepository.searchTodosByTitle(q).then((result) {;
+        _filteredTodos = result;
+        notifyListeners();
+      }).catchError((e) {
+        errorMessage = e.toString();
+      });
     }
 
-    _isSearching = true; // luôn giữ trạng thái search khi typing
+    _isSearching = true;
     notifyListeners();
   }
 
   void toggleSearch() {
     _isSearching = !_isSearching;
     if (!_isSearching) {
-      // khi thoát search thì reset list gốc
       _filteredTodos = _todos;
     }
     notifyListeners();

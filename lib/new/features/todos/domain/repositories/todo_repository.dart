@@ -34,7 +34,8 @@ abstract class TodoRepository {
   Future<void> clearCompletedTodos();
 
   /// find todos by title or description
-  Future<List<Todo>> searchTodosByTitle(String query, List<Todo> source);
+  // Future<List<Todo>> searchTodosByTitle(String query, List<Todo> source);
+  Future<List<Todo>> searchTodosByTitle(String query);
 
   /// Filter todos by their status (all, completed, not completed)
   Future<List<Todo>> filterTodosByStatus(String status);

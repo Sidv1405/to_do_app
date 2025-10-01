@@ -58,14 +58,22 @@ class TodoRepositoryImpl implements TodoRepository {
     return todosDomain;
   }
 
+  // @override
+  // Future<List<Todo>> searchTodosByTitle(String query, List<Todo> source) async {
+  //   if (query.isEmpty) return source;
+  //   final searchLower = query.toLowerCase();
+  //   return source.where((todo) {
+  //     return todo.title.toLowerCase().contains(searchLower) ||
+  //         todo.description.toLowerCase().contains(searchLower);
+  //   }).toList();
+  // }
+
   @override
-  Future<List<Todo>> searchTodosByTitle(String query, List<Todo> source) async {
-    if (query.isEmpty) return source;
-    final searchLower = query.toLowerCase();
-    return source.where((todo) {
-      return todo.title.toLowerCase().contains(searchLower) ||
-          todo.description.toLowerCase().contains(searchLower);
-    }).toList();
+  Future<List<Todo>> searchTodosByTitle(String query) async {
+    final todos = await getTodos();
+    print('print 111111: $todos');
+    final result = todos.where((todo) => todo.title.contains(query)).toList();
+    return result;
   }
 
   @override
