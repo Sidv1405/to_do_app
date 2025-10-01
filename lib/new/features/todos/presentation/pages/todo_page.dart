@@ -15,8 +15,8 @@ class TodoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<TodoPageViewmodel>(
       create: (_) {
-        final viewModel = getIt<TodoPageViewmodel>();
-        viewModel.getTodos();
+        final viewModel = getIt<TodoPageViewmodel>()..getTodos();
+        // viewModel.getTodos();
         return viewModel;
       },
       child: const TodoPageBody(),
@@ -33,12 +33,27 @@ class TodoPageBody extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Todos'),
+        title: todoPageViewModel.isSearching
+            ? TextField(
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Search todos...',
+                  border: InputBorder.none,
+                ),
+                onChanged: (query) {
+                  context.read<TodoPageViewmodel>().searchTodos(query);
+                },
+                style: const TextStyle(height: 1.2),
+              )
+            : const Text('Todos', style: TextStyle(height: 1.2)),
         actions: [
           IconButton(
-            onPressed: todoPageViewModel.getTodos,
-            icon: const Icon(Icons.search),
-            tooltip: 'Search Todos',
+            onPressed: () {
+              context.read<TodoPageViewmodel>().toggleSearch();
+            },
+            icon: Icon(
+              todoPageViewModel.isSearching ? Icons.close : Icons.search,
+            ),
           ),
           PopupMenuButton<String>(
             // initialValue: todoPageViewModel.filter,
@@ -59,13 +74,55 @@ class TodoPageBody extends StatelessWidget {
           ),
         ],
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+              ),
+              child: Text(
+                'Menu',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete),
+              title: const Text('All Todos'),
+              onTap: () {
+                Navigator.of(context).pop();
+                // _showClearCompletedDialog(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete),
+              title: const Text('Active Todos'),
+              onTap: () {
+                Navigator.of(context).pop();
+                // _showClearCompletedDialog(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete),
+              title: const Text('Completed Todos'),
+              onTap: () {
+                Navigator.of(context).pop();
+                // _showClearCompletedDialog(context);
+              },
+            ),
+          ],
+        ),
+      ),
       body: Builder(
         builder: (context) {
           if (todoPageViewModel.isFetching) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final todos = todoPageViewModel.todos;
+          final todos = todoPageViewModel.filteredTodos;
 
           if (todos.isEmpty) {
             return Center(
@@ -90,6 +147,10 @@ class TodoPageBody extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
+                  ),
+                  TextButton(
+                    onPressed: todoPageViewModel.getTodos,
+                    child: const Text('Refresh'),
                   ),
                 ],
               ),

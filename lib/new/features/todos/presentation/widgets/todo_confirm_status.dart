@@ -33,18 +33,23 @@ class _TodoConfirmStatusState extends State<TodoConfirmStatus> {
                 onPressed: () async {
                   final viewmodel = context.read<TodoPageViewmodel>();
                   final id = widget.todo.id;
+
+                  final messenger = ScaffoldMessenger.of(context);
+                  final navigator = Navigator.of(context);
+                  final theme = Theme.of(context);
+
                   if (id != null) {
                     setState(() => _isProcessing = true);
                     try {
                       await viewmodel.changeTodoStatus(id);
+
                       if (!mounted) return;
-                      Navigator.of(context).pop(true);
-                      ScaffoldMessenger.of(context).showSnackBar(
+
+                      navigator.pop(true);
+                      messenger.showSnackBar(
                         SnackBar(
                           content: const Text('Change status todo success'),
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary,
+                          backgroundColor: theme.colorScheme.primary,
                           duration: const Duration(seconds: 2),
                           behavior: SnackBarBehavior.floating,
                         ),
@@ -52,7 +57,7 @@ class _TodoConfirmStatusState extends State<TodoConfirmStatus> {
                     } catch (e) {
                       if (!mounted) return;
                       setState(() => _isProcessing = false);
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      messenger.showSnackBar(
                         SnackBar(
                           content: Text('Error: $e'),
                           backgroundColor: Colors.red,

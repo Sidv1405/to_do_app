@@ -28,45 +28,51 @@ class _TodoConfirmDeleteState extends State<TodoConfirmDelete> {
           ? []
           : [
               TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
+                onPressed: () => Navigator.of(context).pop(false),
                 child: const Text('Cancel'),
               ),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   final viewmodel = context.read<TodoPageViewmodel>();
                   final id = widget.todo.id;
+
+                  final messenger = ScaffoldMessenger.of(context);
+                  final navigator = Navigator.of(context);
+                  final theme = Theme.of(context);
+
                   if (id != null) {
                     setState(() => _isProcessing = true);
-                    // try {
-                    viewmodel.deleteTodo(id);
-                    Navigator.of(context).pop(true);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Delete todo success'),
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        duration: const Duration(seconds: 2),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                    // } catch (e) {
-                    //   if (!mounted) return;
-                    //   setState(() => _isProcessing = false);
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     SnackBar(
-                    //       content: Text('Error: $e'),
-                    //       backgroundColor: Colors.red,
-                    //       duration: const Duration(seconds: 2),
-                    //       behavior: SnackBarBehavior.floating,
-                    //     ),
-                    //   );
-                    // }
+                    try {
+                      await viewmodel.deleteTodo(id);
+
+                      if (!mounted) return;
+
+                      navigator.pop(true);
+                      messenger.showSnackBar(
+                        SnackBar(
+                          content: const Text('Delete todo success'),
+                          backgroundColor: theme.colorScheme.primary,
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    } catch (e) {
+                      if (!mounted) return;
+                      setState(() => _isProcessing = false);
+                      messenger.showSnackBar(
+                        SnackBar(
+                          content: Text('Error: $e'),
+                          backgroundColor: Colors.red,
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
                   } else {
-                    Navigator.of(context).pop(false);
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    navigator.pop(false);
+                    messenger.showSnackBar(
                       SnackBar(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        backgroundColor: theme.colorScheme.primary,
                         duration: const Duration(seconds: 2),
                         content: const Text('Cannot delete todo without id'),
                         behavior: SnackBarBehavior.floating,

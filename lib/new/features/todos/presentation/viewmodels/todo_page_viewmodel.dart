@@ -26,9 +26,15 @@ class TodoPageViewmodel extends ChangeNotifier {
   });
 
   List<Todo> _todos = [];
+  List<Todo> _filteredTodos = [];
   bool _isFetching = false;
   bool _isMutating = false;
   String _errorMessage = '';
+  bool _isSearching = false;
+
+  List<Todo> get filteredTodos => _filteredTodos;
+
+  bool get isSearching => _isSearching;
 
   List<Todo> get todos => _todos;
 
@@ -37,6 +43,14 @@ class TodoPageViewmodel extends ChangeNotifier {
   bool get isMutating => _isMutating;
 
   String get errorMessage => _errorMessage;
+
+  set filteredTodos(List<Todo> value) {
+    _filteredTodos = value;
+  }
+
+  set isSearching(bool value) {
+    _isSearching = value;
+  }
 
   set errorMessage(String value) {
     _errorMessage = value;
@@ -62,6 +76,8 @@ class TodoPageViewmodel extends ChangeNotifier {
     isFetching = true;
     try {
       todos = await todoRepository.getTodos();
+      _filteredTodos = _todos;
+      notifyListeners();
     } catch (e) {
       errorMessage = e.toString();
     } finally {
@@ -159,5 +175,37 @@ class TodoPageViewmodel extends ChangeNotifier {
       _isMutating = false;
       notifyListeners();
     }
+  }
+
+  void searchTodos(String query) {
+    final q = query.trim().toLowerCase();
+
+    if (q.isEmpty) {
+      // Khi xóa hết chữ, vẫn ở chế độ search, nhưng show list gốc
+      _filteredTodos = _todos;
+    } else {
+      _filteredTodos = _todos.where((t) {
+        return t.title.toLowerCase().contains(q) ||
+            t.description.toLowerCase().contains(q);
+      }).toList();
+    }
+
+    _isSearching = true; // luôn giữ trạng thái search khi typing
+    notifyListeners();
+  }
+
+  void toggleSearch() {
+    _isSearching = !_isSearching;
+    if (!_isSearching) {
+      // khi thoát search thì reset list gốc
+      _filteredTodos = _todos;
+    }
+    notifyListeners();
+  }
+
+  void clearSearch() {
+    _isSearching = false;
+    _filteredTodos = _todos;
+    notifyListeners();
   }
 }

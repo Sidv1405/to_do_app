@@ -59,9 +59,13 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   @override
-  Future<List<Todo>> searchTodos(String query) {
-    // TODO: implement searchTodos
-    throw UnimplementedError();
+  Future<List<Todo>> searchTodosByTitle(String query, List<Todo> source) async {
+    if (query.isEmpty) return source;
+    final searchLower = query.toLowerCase();
+    return source.where((todo) {
+      return todo.title.toLowerCase().contains(searchLower) ||
+          todo.description.toLowerCase().contains(searchLower);
+    }).toList();
   }
 
   @override
