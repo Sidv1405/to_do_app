@@ -1,12 +1,13 @@
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do_app/new/features/todos/presentation/viewmodels/todo_page_viewmodel.dart';
 import 'package:to_do_app/new/features/todos/presentation/widgets/todo_confirm_delete.dart';
 import 'package:to_do_app/new/features/todos/presentation/widgets/todo_form_dialog.dart';
-
+import 'package:to_do_app/new/features/todos/presentation/widgets/todo_confirm_status.dart';
+import 'package:to_do_app/new/features/todos/presentation/widgets/todo_item.dart';
 import '../../../../core/di/dependency_container.dart';
-import '../widgets/todo_confirm_status.dart';
-import '../widgets/todo_item.dart';
 
 class TodoPage extends StatelessWidget {
   const TodoPage({super.key});
@@ -14,11 +15,7 @@ class TodoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<TodoPageViewmodel>(
-      create: (_) {
-        final viewModel = getIt<TodoPageViewmodel>()..getTodos();
-        // viewModel.getTodos();
-        return viewModel;
-      },
+      create: (_) => getIt<TodoPageViewmodel>()..getTodos(),
       child: const TodoPageBody(),
     );
   }
@@ -29,198 +26,277 @@ class TodoPageBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final todoPageViewModel = context.watch<TodoPageViewmodel>();
+    final vm = context.watch<TodoPageViewmodel>();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: todoPageViewModel.isSearching
-            ? TextField(
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Search todos...',
-                  border: InputBorder.none,
-                ),
-                onChanged: (query) {
-                  context.read<TodoPageViewmodel>().searchTodos(query);
-                },
-                style: const TextStyle(height: 1.2),
-              )
-            : const Text('Todos', style: TextStyle(height: 1.2)),
-        actions: [
-          IconButton(
-            onPressed: () {
-              context.read<TodoPageViewmodel>().toggleSearch();
-            },
-            icon: Icon(
-              todoPageViewModel.isSearching ? Icons.close : Icons.search,
-            ),
-          ),
-          PopupMenuButton<String>(
-            // initialValue: todoPageViewModel.filter,
-            onSelected: (filter) {
-              // context.read<TodoPageViewmodel>().setFilter(filter);
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'TodoFilter.all', child: Text('All')),
-              const PopupMenuItem(
-                value: 'TodoFilter.active',
-                child: Text('Active'),
+    if (Platform.isIOS) {
+      // iOS style
+      return CupertinoPageScaffold(
+        navigationBar: CupertinoNavigationBar(
+          middle: vm.isSearching
+              ? CupertinoSearchTextField(onChanged: vm.searchTodos)
+              : const Text('Todos'),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                child: Icon(vm.isSearching ? CupertinoIcons.clear : CupertinoIcons.search),
+                onPressed: vm.toggleSearch,
               ),
-              const PopupMenuItem(
-                value: 'TodoFilter.completed',
-                child: Text('Completed'),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                child: const Icon(CupertinoIcons.ellipsis_vertical),
+                onPressed: () => _showDrawerSheet(context, vm),
               ),
             ],
           ),
-        ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
-              child: Text(
-                'Menu',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                ),
-              ),
+        ),
+        child: SafeArea(
+          child: Stack(
+            children: [
+              _buildIOSList(context, vm),
+              _buildIOSFloatingButton(context, vm),
+            ],
+          ),
+        ),
+      );
+    } else {
+      // Android style
+      return Scaffold(
+        appBar: AppBar(
+          title: vm.isSearching
+              ? TextField(
+            autofocus: true,
+            decoration: const InputDecoration(
+              hintText: 'Search todos...',
+              border: InputBorder.none,
             ),
-            ListTile(
-              leading: const Icon(Icons.delete),
-              title: const Text('All Todos'),
-              onTap: () {
-                Navigator.of(context).pop();
-                // _showClearCompletedDialog(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete),
-              title: const Text('Active Todos'),
-              onTap: () {
-                Navigator.of(context).pop();
-                // _showClearCompletedDialog(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete),
-              title: const Text('Completed Todos'),
-              onTap: () {
-                Navigator.of(context).pop();
-                // _showClearCompletedDialog(context);
-              },
+            onChanged: vm.searchTodos,
+          )
+              : const Text('Todos'),
+          actions: [
+            IconButton(
+              icon: Icon(vm.isSearching ? Icons.close : Icons.search),
+              onPressed: vm.toggleSearch,
             ),
           ],
         ),
-      ),
-      body: Builder(
-        builder: (context) {
-          if (todoPageViewModel.isFetching) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final todos = todoPageViewModel.filteredTodos;
-
-          if (todos.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.task_alt,
-                    size: 64,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No todos yet',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Press the + button to add a new todo',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: todoPageViewModel.getTodos,
-                    child: const Text('Refresh'),
-                  ),
-                ],
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+                child: Text('Menu', style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white)),
               ),
-            );
-          }
+              ListTile(
+                leading: const Icon(Icons.list),
+                title: const Text('All Todos'),
+                onTap: () {
+                  Navigator.pop(context);
+                  // vm.setFilter('all');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.check_circle_outline),
+                title: const Text('Active Todos'),
+                onTap: () {
+                  Navigator.pop(context);
+                  // vm.setFilter('active');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.done_all),
+                title: const Text('Completed Todos'),
+                onTap: () {
+                  Navigator.pop(context);
+                  // vm.setFilter('completed');
+                },
+              ),
+            ],
+          ),
+        ),
+        body: RefreshIndicator(
+          onRefresh: vm.getTodos,
+          child: _buildAndroidList(context, vm),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => _showTodoDialog(context, const TodoFormDialog()),
+          child: const Icon(Icons.add),
+        ),
+      );
+    }
+  }
 
-          return RefreshIndicator(
-            onRefresh: () => todoPageViewModel.getTodos(),
-            child: ListView.builder(
-              itemCount: todos.length,
-              itemBuilder: (context, index) {
-                final todo = todos[index];
-                return TodoItem(
-                  key: ValueKey(todo.id),
-                  todo: todo,
-                  onToggle: () =>
-                      _showTodoDialog(context, TodoConfirmStatus(todo: todo)),
-                  onUpdate: () =>
-                      _showTodoDialog(context, TodoFormDialog(todo: todo)),
-                  onDelete: () =>
-                      _showTodoDialog(context, TodoConfirmDelete(todo: todo)),
-                );
-              },
-            ),
-          );
-        },
-      ),
-      floatingActionButton: Builder(
-        builder: (innerContext) {
-          return FloatingActionButton(
-            onPressed: () {
-              _showTodoDialog(innerContext, const TodoFormDialog());
+  // ====================== IOS ======================
+  Widget _buildIOSList(BuildContext context, TodoPageViewmodel vm) {
+    if (vm.isFetching) return const Center(child: CupertinoActivityIndicator());
+
+    final todos = vm.filteredTodos;
+    if (todos.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(CupertinoIcons.check_mark_circled, size: 64, color: CupertinoColors.inactiveGray),
+            const SizedBox(height: 16),
+            const Text('No todos yet', style: TextStyle(color: CupertinoColors.inactiveGray)),
+            CupertinoButton(onPressed: vm.getTodos, child: const Text('Refresh')),
+          ],
+        ),
+      );
+    }
+
+    return CustomScrollView(
+      slivers: [
+        CupertinoSliverRefreshControl(onRefresh: vm.getTodos),
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+                (context, index) {
+              final todo = todos[index];
+              return TodoItem(
+                key: ValueKey(todo.id),
+                todo: todo,
+                onToggle: () => _showTodoDialog(context, TodoConfirmStatus(todo: todo)),
+                onUpdate: () => _showTodoDialog(context, TodoFormDialog(todo: todo)),
+                onDelete: () => _showTodoDialog(context, TodoConfirmDelete(todo: todo)),
+              );
             },
-            tooltip: 'Add new todo',
-            child: const Icon(Icons.add),
-          );
-        },
+            childCount: todos.length,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIOSFloatingButton(BuildContext context, TodoPageViewmodel vm) {
+    return Positioned(
+      bottom: 16,
+      right: 16,
+      child: CupertinoButton(
+        padding: const EdgeInsets.all(16),
+        borderRadius: BorderRadius.circular(30),
+        color: CupertinoColors.activeBlue,
+        child: const Icon(CupertinoIcons.add, color: CupertinoColors.white),
+        onPressed: () => _showTodoDialog(context, const TodoFormDialog()),
+      ),
+    );
+  }
+
+  // ====================== ANDROID ======================
+  Widget _buildAndroidList(BuildContext context, TodoPageViewmodel vm) {
+    if (vm.isFetching) return ListView(children: const [Center(child: CircularProgressIndicator())]);
+
+    final todos = vm.filteredTodos;
+    if (todos.isEmpty) {
+      return ListView(
+        children: [
+          const SizedBox(height: 50),
+          const Center(child: Text('No todos yet')),
+          TextButton(onPressed: vm.getTodos, child: const Text('Refresh')),
+        ],
+      );
+    }
+
+    return ListView.builder(
+      itemCount: todos.length,
+      itemBuilder: (context, index) {
+        final todo = todos[index];
+        return TodoItem(
+          key: ValueKey(todo.id),
+          todo: todo,
+          onToggle: () => _showTodoDialog(context, TodoConfirmStatus(todo: todo)),
+          onUpdate: () => _showTodoDialog(context, TodoFormDialog(todo: todo)),
+          onDelete: () => _showTodoDialog(context, TodoConfirmDelete(todo: todo)),
+        );
+      },
+    );
+  }
+}
+
+// ====================== DIALOG ======================
+void _showTodoDialog(BuildContext context, Widget dialog) {
+  final vm = context.read<TodoPageViewmodel>();
+
+  if (Platform.isIOS) {
+    showCupertinoDialog(
+      context: context,
+      builder: (_) => ChangeNotifierProvider.value(
+        value: vm,
+        child: AbsorbPointer(
+          absorbing: vm.isMutating,
+          child: Stack(
+            children: [
+              dialog,
+              if (vm.isMutating)
+                const Positioned.fill(
+                  child: ColoredBox(
+                    color: Color(0x66000000),
+                    child: Center(child: CupertinoActivityIndicator()),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  } else {
+    showDialog(
+      context: context,
+      builder: (_) => ChangeNotifierProvider.value(
+        value: vm,
+        child: AbsorbPointer(
+          absorbing: vm.isMutating,
+          child: Stack(
+            children: [
+              dialog,
+              if (vm.isMutating)
+                const Positioned.fill(
+                  child: ColoredBox(
+                    color: Color(0x66000000),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-void _showTodoDialog(BuildContext context, Widget dialog) {
-  final viewModel = context.read<TodoPageViewmodel>();
-
-  showDialog(
+// Drawer-style menu dùng ActionSheet trên iOS
+void _showDrawerSheet(BuildContext context, TodoPageViewmodel vm) {
+  showCupertinoModalPopup(
     context: context,
-    builder: (_) => ChangeNotifierProvider.value(
-      value: viewModel,
-      child: Consumer<TodoPageViewmodel>(
-        builder: (context, vm, _) {
-          return PopScope(
-            canPop: !vm.isMutating,
-            child: AbsorbPointer(
-              absorbing: vm.isMutating,
-              child: Stack(
-                children: [
-                  dialog,
-                  if (vm.isMutating)
-                    const Positioned.fill(
-                      child: ColoredBox(
-                        color: Colors.black26,
-                        child: Center(child: CircularProgressIndicator()),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          );
-        },
+    builder: (_) => CupertinoActionSheet(
+      title: const Text('Menu'),
+      actions: [
+        CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.pop(context);
+            // vm.setFilter('all');
+          },
+          child: const Text('All Todos'),
+        ),
+        CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.pop(context);
+            // vm.setFilter('active');
+          },
+          child: const Text('Active Todos'),
+        ),
+        CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.pop(context);
+            // vm.setFilter('completed');
+          },
+          child: const Text('Completed Todos'),
+        ),
+      ],
+      cancelButton: CupertinoActionSheetAction(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Cancel'),
       ),
     ),
   );
