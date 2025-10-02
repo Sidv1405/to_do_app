@@ -43,9 +43,27 @@ lib/
 │ │ │ └── usecases/        
 │ │ │
 │ │ ├── presentation/
-│ │ │ ├── viewmodels/       
 │ │ │ ├── pages/             
+│ │ │ ├── viewmodels/       
 │ │ │ └── widgets/      
-│
+│ │ │
+│ │ ├── auth/
+│ │ ├── data/
+│ │ │ ├── datasources/       
+│ │ │ │ ├── remote/       
+│ │ │ │ └── local/         
+│ │ │ ├── models/           
+│ │ │ ├── mappers/          
+│ │ │ └── repositories/     
+│ │ │
+│ │ ├── domain/
+│ │ │ ├── entities/          
+│ │ │ ├── repositories/      
+│ │ │ └── usecases/        
+│ │ │
+│ │ ├── presentation/
+│ │ │ ├── pages/             
+│ │ │ ├── viewmodels/       
+│ │ │ └── widgets/   
 ├── app.dart                       
 └── main.dart                      

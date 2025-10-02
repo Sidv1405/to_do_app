@@ -1,13 +1,12 @@
-import 'package:to_do_app/new/core/service/api_service.dart';
+import 'package:to_do_app/new/features/todos/data/datasources/remote/todo_remote_data_source.dart';
 import 'package:to_do_app/new/features/todos/data/mappers/todo_mapper.dart';
 import 'package:to_do_app/new/features/todos/domain/entities/todo.dart';
-
-import '../../domain/repositories/todo_repository.dart';
+import 'package:to_do_app/new/features/todos/domain/repositories/todo_repository.dart';
 
 class TodoRepositoryImpl implements TodoRepository {
-  final ApiService apiService;
+  final TodoRemoteDataSource remoteDataSource;
 
-  TodoRepositoryImpl({required this.apiService});
+  TodoRepositoryImpl({required this.remoteDataSource});
 
   @override
   Future<Todo> addTodo(
@@ -16,46 +15,28 @@ class TodoRepositoryImpl implements TodoRepository {
     DateTime createdAt,
     DateTime dueDate,
   ) async {
-    final newTodo = await apiService.addTodo(
+    final model = await remoteDataSource.addTodo(
       title,
       description,
       createdAt,
       dueDate,
     );
-    return newTodo.toEntity();
+    return model.toEntity();
   }
 
   @override
-  Future<void> clearCompletedTodos() {
-    // TODO: implement clearCompletedTodos
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> deleteTodo(String id) async {
-    final response = await apiService.deleteTodo(id);
-    return response;
-  }
-
-  @override
-  Future<List<Todo>> filterTodosByStatus(String status) {
-    // TODO: implement filterTodosByStatus
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Todo> getTodoById(String id) {
-    return getTodos().then(
-      (todos) => todos.firstWhere((todo) => todo.id == id),
-    );
-  }
+  Future<void> deleteTodo(String id) => remoteDataSource.deleteTodo(id);
 
   @override
   Future<List<Todo>> getTodos() async {
-    final todosModel = await apiService.getTodos();
-    // map sang domain entity
-    final todosDomain = todosModel.toEntityList().toList();
-    return todosDomain;
+    final models = await remoteDataSource.getTodos();
+    return models.toEntityList().toList();
+  }
+
+  @override
+  Future<Todo> getTodoById(String id) async {
+    final todos = await getTodos();
+    return todos.firstWhere((t) => t.id == id);
   }
 
   // @override
@@ -71,22 +52,7 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<List<Todo>> searchTodosByTitle(String query) async {
     final todos = await getTodos();
-    print('print 111111: $todos');
-    final result = todos.where((todo) => todo.title.contains(query)).toList();
-    return result;
-  }
-
-  @override
-  Future<List<Todo>> sortTodosByDate(String dateType) {
-    // TODO: implement sortTodosByDate
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Todo> changeTodoStatus(String id) async {
-    final todo = await getTodoById(id);
-    final updatedTodo = await apiService.changeTodoStatus(id, !todo.isDone);
-    return updatedTodo.toEntity();
+    return todos.where((t) => t.title.contains(query)).toList();
   }
 
   @override
@@ -97,13 +63,35 @@ class TodoRepositoryImpl implements TodoRepository {
     DateTime createdAt,
     DateTime dueDate,
   ) async {
-    final newTodo = await apiService.updateTodo(
+    final model = await remoteDataSource.updateTodo(
       id,
       title,
       description,
       createdAt,
       dueDate,
     );
-    return newTodo.toEntity();
+    return model.toEntity();
+  }
+
+  @override
+  Future<Todo> changeTodoStatus(String id) async {
+    final todo = await getTodoById(id);
+    final updated = await remoteDataSource.changeTodoStatus(id, !todo.isDone);
+    return updated.toEntity();
+  }
+
+  @override
+  Future<void> clearCompletedTodos() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Todo>> filterTodosByStatus(String status) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Todo>> sortTodosByDate(String dateType) {
+    throw UnimplementedError();
   }
 }

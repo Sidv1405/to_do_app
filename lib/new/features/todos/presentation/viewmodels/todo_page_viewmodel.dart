@@ -183,12 +183,15 @@ class TodoPageViewmodel extends ChangeNotifier {
     if (q.isEmpty) {
       _filteredTodos = _todos;
     } else {
-      todoRepository.searchTodosByTitle(q).then((result) {;
-        _filteredTodos = result;
-        notifyListeners();
-      }).catchError((e) {
-        errorMessage = e.toString();
-      });
+      todoRepository
+          .searchTodosByTitle(q)
+          .then((result) {
+            _filteredTodos = result;
+            notifyListeners();
+          })
+          .catchError((e) {
+            errorMessage = e.toString();
+          });
     }
 
     _isSearching = true;

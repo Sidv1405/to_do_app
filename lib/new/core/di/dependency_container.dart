@@ -3,6 +3,8 @@ import 'package:to_do_app/new/core/constants/api_constants.dart';
 import 'package:to_do_app/new/core/network/dio_client.dart';
 import 'package:to_do_app/new/core/network/dio_helper.dart';
 import 'package:to_do_app/new/core/service/api_service.dart';
+import 'package:to_do_app/new/features/todos/data/datasources/remote/todo_remote_data_source.dart';
+import 'package:to_do_app/new/features/todos/data/datasources/remote/todo_remote_data_source_impl.dart';
 import 'package:to_do_app/new/features/todos/data/repositories/todo_repository_impl.dart';
 import 'package:to_do_app/new/features/todos/domain/repositories/todo_repository.dart';
 import 'package:to_do_app/new/features/todos/domain/usecases/add_todo_usecase.dart';
@@ -14,25 +16,44 @@ import 'package:to_do_app/new/features/todos/domain/usecases/toggle_todo_usecase
 import 'package:to_do_app/new/features/todos/domain/usecases/update_todo_usecase.dart';
 import 'package:to_do_app/new/features/todos/presentation/viewmodels/todo_page_viewmodel.dart';
 
+import '../service/auth_service.dart';
+
 final getIt = GetIt.instance;
 
 Future<void> initDependencies() async {
-  //DioClient
+  // Auth DioClient
   getIt.registerLazySingleton<DioClient>(
-    () => DioClient(DioHelper.buildDio(baseUrl: Constants.baseURL)),
+    () => DioClient(DioHelper.buildDio(baseUrl: Constants.authBaseURL)),
+    instanceName: 'auth',
   );
 
-  //ApiService
+  // AuthService
+  getIt.registerLazySingleton<AuthService>(
+    () => AuthService(dioClient: getIt<DioClient>(instanceName: 'auth')),
+  );
+
+  // Todos DioClient
+  getIt.registerLazySingleton<DioClient>(
+    () => DioClient(DioHelper.buildDio(baseUrl: Constants.todoBaseURL)),
+    instanceName: 'todos',
+  );
+
+  // ApiService
   getIt.registerLazySingleton<ApiService>(
-    () => ApiService(dioClient: getIt<DioClient>()),
+    () => ApiService(dioClient: getIt<DioClient>(instanceName: 'todos')),
   );
 
-  //Repository
+  // RemoteDataSource
+  getIt.registerLazySingleton<TodoRemoteDataSource>(
+    () => TodoRemoteDataSourceImpl(apiService: getIt<ApiService>()),
+  );
+
+  // Repository
   getIt.registerLazySingleton<TodoRepository>(
-    () => TodoRepositoryImpl(apiService: getIt<ApiService>()),
+    () => TodoRepositoryImpl(remoteDataSource: getIt<TodoRemoteDataSource>()),
   );
 
-  //UseCases
+  // UseCases
   getIt.registerLazySingleton<AddTodoUseCase>(
     () => AddTodoUseCase(repository: getIt<TodoRepository>()),
   );
@@ -55,7 +76,7 @@ Future<void> initDependencies() async {
     () => UpdateTodoUseCase(repository: getIt<TodoRepository>()),
   );
 
-  //ViewModel
+  // ViewModel
   getIt.registerLazySingleton<TodoPageViewmodel>(
     () => TodoPageViewmodel(
       clearCompletedTodosUseCase: getIt<ClearCompletedTodosUseCase>(),
