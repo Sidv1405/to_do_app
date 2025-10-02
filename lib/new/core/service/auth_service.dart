@@ -1,4 +1,5 @@
 import 'package:to_do_app/new/core/network/dio_client.dart';
+import 'package:dio/dio.dart';
 
 class AuthService {
   final DioClient dioClient;
@@ -8,10 +9,7 @@ class AuthService {
   Future<Map<String, dynamic>> login(String username, String password) async {
     final response = await dioClient.post(
       '/auth/login',
-      data: {
-        'username': username,
-        'password': password,
-      },
+      data: {'username': username, 'password': password},
     );
     return response; // DummyJSON trả về accessToken, refreshToken, user info
   }
@@ -19,10 +17,8 @@ class AuthService {
   Future<Map<String, dynamic>> register(String email, String password) async {
     final response = await dioClient.post(
       '/register',
-      data: {
-        'email': email,
-        'password': password,
-      },
+      data: {'email': email, 'password': password},
+      options: Options(headers: {'x-api-key': 'reqres-free-v1'}),
     );
     return response;
   }

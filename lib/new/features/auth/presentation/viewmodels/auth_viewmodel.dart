@@ -19,6 +19,7 @@ class AuthViewModel extends ChangeNotifier {
 
       // Gọi repository
       // final AuthUser loggedInUser = await userRepository.login(email, password);
+      // print('Login Response: $loggedInUser');
 
       // user = loggedInUser;
 
@@ -28,6 +29,37 @@ class AuthViewModel extends ChangeNotifier {
       // Login thành công
       return true;
     } catch (e) {
+      print('Login Error: $e');
+      isLoading = false;
+      errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> register(String name, String email, String password) async {
+    try {
+      isLoading = true;
+      errorMessage = null;
+      notifyListeners();
+
+      // Gọi repository
+      final AuthUser newUser = await userRepository.register(email, password);
+
+      // In response trả về
+      print('Register Response: $newUser');
+      print('User Token: ${newUser.token}');
+      print('User ID: ${newUser.id}');
+
+      user = newUser;
+
+      isLoading = false;
+      notifyListeners();
+
+      // Đăng ký thành công
+      return true;
+    } catch (e) {
+      print('Register Error: $e');
       isLoading = false;
       errorMessage = e.toString();
       notifyListeners();
@@ -38,6 +70,5 @@ class AuthViewModel extends ChangeNotifier {
   void logout() {
     user = null;
     notifyListeners();
-    // TODO: Xóa token từ SharedPreferences nếu lưu
   }
 }

@@ -3,6 +3,8 @@ import 'package:to_do_app/new/core/constants/api_constants.dart';
 import 'package:to_do_app/new/core/network/dio_client.dart';
 import 'package:to_do_app/new/core/network/dio_helper.dart';
 import 'package:to_do_app/new/core/service/api_service.dart';
+import 'package:to_do_app/new/features/auth/data/datasources/remote/auth_remote_data_source.dart';
+import 'package:to_do_app/new/features/auth/data/datasources/remote/auth_remote_data_source_impl.dart';
 import 'package:to_do_app/new/features/todos/data/datasources/remote/todo_remote_data_source.dart';
 import 'package:to_do_app/new/features/todos/data/datasources/remote/todo_remote_data_source_impl.dart';
 import 'package:to_do_app/new/features/todos/data/repositories/todo_repository_impl.dart';
@@ -16,6 +18,8 @@ import 'package:to_do_app/new/features/todos/domain/usecases/toggle_todo_usecase
 import 'package:to_do_app/new/features/todos/domain/usecases/update_todo_usecase.dart';
 import 'package:to_do_app/new/features/todos/presentation/viewmodels/todo_page_viewmodel.dart';
 
+import '../../features/auth/data/repositories/user_repository_impl.dart';
+import '../../features/auth/domain/repositories/user_repository.dart';
 import '../service/auth_service.dart';
 
 final getIt = GetIt.instance;
@@ -47,10 +51,16 @@ Future<void> initDependencies() async {
   getIt.registerLazySingleton<TodoRemoteDataSource>(
     () => TodoRemoteDataSourceImpl(apiService: getIt<ApiService>()),
   );
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(authService: getIt<AuthService>()),
+  );
 
   // Repository
   getIt.registerLazySingleton<TodoRepository>(
     () => TodoRepositoryImpl(remoteDataSource: getIt<TodoRemoteDataSource>()),
+  );
+  getIt.registerLazySingleton<UserRepository>(
+    () => UserRepositoryImpl(remoteDataSource: getIt<AuthRemoteDataSource>()),
   );
 
   // UseCases
