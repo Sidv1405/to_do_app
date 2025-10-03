@@ -5,6 +5,12 @@ import 'package:to_do_app/new/features/todos/presentation/widgets/todo_confirm_d
 import 'package:to_do_app/new/features/todos/presentation/widgets/todo_form_dialog.dart';
 
 import '../../../../core/di/dependency_container.dart';
+import '../../domain/repositories/todo_repository.dart';
+import '../../domain/usecases/add_todo_usecase.dart';
+import '../../domain/usecases/clear_completed_todos_usecase.dart';
+import '../../domain/usecases/filter_todos_usecase.dart';
+import '../../domain/usecases/search_todos_usecase.dart';
+import '../../domain/usecases/sort_todos_usecase.dart';
 import '../widgets/todo_confirm_status.dart';
 import '../widgets/todo_item.dart';
 
@@ -14,15 +20,19 @@ class TodoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<TodoPageViewmodel>(
-      create: (_) {
-        final viewModel = getIt<TodoPageViewmodel>()..getTodos();
-        // viewModel.getTodos();
-        return viewModel;
-      },
+      create: (ctx) => TodoPageViewmodel(
+        clearCompletedTodosUseCase: ctx.read<ClearCompletedTodosUseCase>(),
+        filterTodosUseCase: ctx.read<FilterTodosUseCase>(),
+        searchTodosUseCase: ctx.read<SearchTodosUseCase>(),
+        sortTodosUseCase: ctx.read<SortTodosUseCase>(),
+        todoRepository: ctx.read<TodoRepository>(),
+        addTodoUseCase: ctx.read<AddTodoUseCase>(),
+      )..getTodos(),
       child: const TodoPageBody(),
     );
   }
 }
+
 
 class TodoPageBody extends StatelessWidget {
   const TodoPageBody({super.key});

@@ -11,7 +11,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController(text: 'demo1');
   final TextEditingController _emailController = TextEditingController(text: 'eve.holt@reqres.in');
   final TextEditingController _passwordController = TextEditingController(text: 'pistol');
   final TextEditingController _confirmPasswordController = TextEditingController(text: 'pistol');
@@ -106,18 +106,23 @@ class _RegisterPageState extends State<RegisterPage> {
 
                       final success = await authVM.register(name, email, password);
 
-                      if (success && mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Đăng ký thành công!')),
-                        );
-                        context.go('/login');
-                      } else if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(authVM.errorMessage ?? 'Đăng ký thất bại')),
-                        );
+                      if (context.mounted) { // check trực tiếp trên context
+                        final messenger = ScaffoldMessenger.of(context);
+
+                        if (success) {
+                          messenger.showSnackBar(
+                            const SnackBar(content: Text('Đăng nhập thành công!')),
+                          );
+                          context.go('/home');
+                        } else {
+                          messenger.showSnackBar(
+                            SnackBar(content: Text(authVM.errorMessage ?? 'Đăng nhập thất bại')),
+                          );
+                        }
                       }
                     }
-                  },
+                  }
+                  ,
                   child: const Text('Đăng ký'),
                 ),
                 const SizedBox(height: 12),
